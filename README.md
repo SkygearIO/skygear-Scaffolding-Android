@@ -12,7 +12,7 @@ You can start create an android app with [Skygear](https://skygear.io) by the fo
 
 6. 	Run a script to update your application settings:
 
-	`./gradlew -q updateAppSettings`
+	`./gradlew updateAppSettings`
 
 7. Open the project with Android Studio.
 
