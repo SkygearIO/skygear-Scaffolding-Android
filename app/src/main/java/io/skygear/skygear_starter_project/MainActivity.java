@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
         Configuration config = this.skygear.getConfig();
         User currentUser = this.skygear.getCurrentUser();
 
-        this.endpointTextView.setText(String.format("Endpoint: %s", config.endpoint));
-        this.apiKeyTextView.setText(String.format("API Key: %s", config.apiKey));
+        this.endpointTextView.setText(String.format("Endpoint: %s", config.getEndpoint()));
+        this.apiKeyTextView.setText(String.format("API Key: %s", config.getApiKey()));
 
         String accessToken = "Undefined";
         String userId = "Undefined";
