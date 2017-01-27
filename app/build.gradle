@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion getBuildToolsVersionAtLeast("24.0.0")
 
     defaultConfig {
         applicationId "io.skygear.skygear_starter_project"
@@ -24,4 +24,55 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'io.skygear:skygear:+'
+}
+
+/**
+ * Find a proper build tools version
+ *
+ * Ref. https://github.com/aayvazyan-tgm/autodetect_android_sdk_and_buildTools/blob/8ffc727ed87fb3370626e2ecbef078177ed33c86/sdktools.gradle
+ *
+ */
+String androidSDKDir() {
+    def sdkDir = android.getSdkDirectory().toString()
+    return sdkDir
+}
+
+String[] buildToolsAvailable() {
+    def buildToolsDir = new File(androidSDKDir(), "build-tools")
+    String[] collection = buildToolsDir.list([accept:{ d, f-> !f.contains("android") }] as FilenameFilter)
+    for (int i = 0; i < collection.length; i++) {
+        String s = collection[i]
+        collection[i] = s.replace("build-tools-","")
+    }
+    collection.sort { a, b -> b <=> a }
+}
+
+String getBuildToolsVersionAtLeast(String baseBuildToolsVersion) {
+    def buildToolsVersions = buildToolsAvailable()
+    if (buildToolsVersions.length == 0) {
+        return baseBuildToolsVersion
+    }
+
+    def greatestVersion = buildToolsVersions[0]
+    def greatestVersionTokenized = greatestVersion.tokenize('.')
+    def baseVersionTokenized = baseBuildToolsVersion.tokenize('.')
+
+    def isPassing = true
+    for (int idx = 0;
+         idx < greatestVersionTokenized.size() && idx < baseVersionTokenized.size();
+         idx++
+    ) {
+        if (greatestVersionTokenized.get(idx) < baseVersionTokenized.get(idx)) {
+            isPassing = false
+            break
+        }
+    }
+
+    if (isPassing) {
+        println "Using build tools version: " + greatestVersion
+        return greatestVersion
+    }
+
+    println "Fallback to build tools version: " + baseBuildToolsVersion
+    return baseBuildToolsVersion
 }
