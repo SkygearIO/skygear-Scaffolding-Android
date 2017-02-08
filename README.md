@@ -9,7 +9,16 @@ You can start create an android app with [Skygear](https://skygear.io) by the fo
 5. Unzip it and open in Terminal.
 6. Declare the location of Android SDK:
 
+  For default Android Studio installation on Mac, the path should be as follow
+
   `export ANDROID_HOME=$HOME/Library/Android/sdk`
+
+  For Linux distribution, the path default path should be as follow
+
+  `export ANDROID_HOME=/opt/android/sdk`
+
+  For other installation method, like homebrew. Please refer back to the
+  installation document.
 
 7. Run a script to update your application settings:
 
