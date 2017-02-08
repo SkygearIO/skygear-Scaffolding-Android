@@ -9,11 +9,11 @@ You can start create an android app with [Skygear](https://skygear.io) by the fo
 5. Unzip it and open in Terminal.
 6. Declare the location of Android SDK:
 
-	`export ANDROID_HOME=$HOME/Library/Android/sdk`
+  `export ANDROID_HOME=$HOME/Library/Android/sdk`
 
-7. 	Run a script to update your application settings:
+7. Run a script to update your application settings:
 
-	`./gradlew updateAppSettings`
+  `./gradlew updateAppSettings`
 
 8. Open the project with Android Studio.
 
