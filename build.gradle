@@ -1,4 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply plugin: 'java'
+
 import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
@@ -23,41 +25,137 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-File[] fileList(String dir) {
-    file(dir).listFiles({file -> file.isFile() } as FileFilter).sort()
-}
+task updateAppSettings {
+    def templateDir = "template/"
+    def appRootDir = "app/"
+    def appSourceDir = "${appRootDir}src/main/java/io/skygear/skygear_starter_project/"
+    def skygearEndpoint = ""
+    def skygearApiKey = ""
+    def shouldInstallSkygearChatSdk = false
 
-task updateAppSettings << {
-    def TemplateDir = "template/"
-    def AppDir = "app/src/main/java/io/skygear/skygear_starter_project/"
-    def endpoint = ""
-    def apiKey = ""
+    def Closure<String> prompt = {
+        String question = "",
+        String promptPrefix = "",
+        Closure<Boolean> validation = { true } ->
 
-    endpoint = System.console().readLine(
-            "\nWhat is your skygear endpoint (You can find it in portal)?" +
-            "\nExample: https://myapp.skygeario.com/" +
-            "\n> "
-    )
+            if (question.length() > 0) {
+                System.console().println("\n" + question)
+            }
 
-    while (endpoint.trim().length() == 0) {
-        endpoint = System.console().readLine("> ");
+            def promptLine = "${promptPrefix} > "
+            def result = null
+            while (true) {
+                result = System.console().readLine(promptLine)
+
+                try {
+                    if (validation(result)) {
+                        break
+                    }
+                } catch (e) {
+                    System.console().println("Error: ${e.message}")
+                }
+
+            }
+
+            return result
     }
 
-    apiKey = System.console().readLine(
-            "\nWhat is your skygear API key (You can find it in portal)?" +
-            "\nExample: dc0903fa85924776baa77df813901efc" +
-            "\n> "
-    )
+    doFirst {
+        // Read skygear endpoint
+        skygearEndpoint = prompt(
+                "What is your skygear endpoint (You can find it in portal)?\n" +
+                        "Example: https://myapp.skygeario.com/",
+                "",
+                { String result ->
+                    if (result.length() == 0) {
+                        return false
+                    }
 
-    while (apiKey.trim().length() == 0) {
-        apiKey = System.console().readLine("> ");
+                    def url = new URL(result)
+                    def protocol = url.protocol.toLowerCase()
+                    def host = url.host.toLowerCase()
+                    def path = url.path.toLowerCase()
+
+                    if (!protocol.equals("http") && !protocol.equals("https")) {
+                        throw new IllegalArgumentException("Only HTTP(S) is accepted.")
+                    }
+
+                    if (host.length() == 0) {
+                        throw new IllegalArgumentException("Missing hostname.")
+                    }
+
+                    if (path.length() == 0) {
+                        throw new IllegalArgumentException("Missing path.")
+                    }
+
+                    if (!path.substring(path.length() - 1).equals("/")) {
+                        throw new IllegalArgumentException("Missing trailing slash")
+                    }
+
+                    return true
+                }
+        ).trim().toLowerCase()
+
+        // Read API key
+        skygearApiKey = prompt(
+                "What is your skygear API key (You can find it in portal)?\n" +
+                        "Example: dc0903fa85924776baa77df813901efc",
+                "",
+                { it.trim().length() != 0 }
+        )
+
+        // Read whether should install chat sdk
+        def installChatSdkAnswer = prompt(
+                "Do you want to install Skygear Chat extension? \n" +
+                        "(The core SDK already got Auth, CloudDB, Push and Pubsub)",
+                "[YES/no]",
+                { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
+        ).trim().toLowerCase()
+
+        shouldInstallSkygearChatSdk = (
+                installChatSdkAnswer.length() == 0 ||
+                installChatSdkAnswer.equals("yes")
+        )
     }
 
-    copy {
-        from(TemplateDir)
-        into(AppDir)
-        include('MyApplication.java')
-        filter(ReplaceTokens, tokens:[ENDPOINT: endpoint, APIKEY: apiKey])
+    doLast {
+        System.console().println("\nScaffolding with the following settings:")
+        System.console().println("Endpoint: ${skygearEndpoint}")
+        System.console().println("API key: ${skygearApiKey}")
+        System.console().println("Install Skygear Chat SDK: ${shouldInstallSkygearChatSdk}")
+
+        def allowOverwrite = ""
+
+        // Update MyApplication.java
+        allowOverwrite = prompt(
+                "The \"MyApplication.java\" file will be overwritten, continue? ",
+                "[yes/NO]",
+                { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
+        ).toLowerCase()
+
+        if (allowOverwrite.equals("yes")) {
+            copy {
+                from(templateDir)
+                into(appSourceDir)
+                include('MyApplication.java')
+                filter(ReplaceTokens, tokens:[ENDPOINT: skygearEndpoint, APIKEY: skygearApiKey])
+            }
+        } else {
+            System.console().println("Skipped")
+        }
+
+        // Update build.gradle
+        allowOverwrite = prompt(
+                "The \"build.gradle\" file will be overwritten, continue? ",
+                "[yes/NO]",
+                { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
+        ).toLowerCase()
+
+        if (allowOverwrite.equals("yes")) {
+            // TODO: update build.gradle
+        } else {
+            System.console().println("Skipped")
+        }
     }
 }
 
