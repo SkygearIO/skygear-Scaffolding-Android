@@ -31,7 +31,7 @@ task updateAppSettings {
     def appSourceDir = "${appRootDir}src/main/java/io/skygear/skygear_starter_project/"
     def skygearEndpoint = ""
     def skygearApiKey = ""
-    def shouldInstallSkygearChatSdk = false
+    def installingPlugins = [] as LinkedList<String>
 
     def Closure<String> prompt = {
         String question = "",
@@ -112,17 +112,22 @@ task updateAppSettings {
                 { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
         ).trim().toLowerCase()
 
-        shouldInstallSkygearChatSdk = (
-                installChatSdkAnswer.length() == 0 ||
-                installChatSdkAnswer.equals("yes")
-        )
+        if (installChatSdkAnswer.length() == 0 || installChatSdkAnswer.equals("yes")) {
+            installingPlugins.add("io.skygear.plugins:chat:+")
+        }
     }
 
     doLast {
         System.console().println("\nScaffolding with the following settings:")
         System.console().println("Endpoint: ${skygearEndpoint}")
         System.console().println("API key: ${skygearApiKey}")
-        System.console().println("Install Skygear Chat SDK: ${shouldInstallSkygearChatSdk}")
+
+        System.console().printf(
+                "Installing Skygear Plugins: \n%s\n",
+                installingPlugins.size() > 0
+                        ? installingPlugins.collect { "  - ${it}" }.join("\n")
+                        : "None"
+        )
 
         def allowOverwrite = ""
 
@@ -144,17 +149,27 @@ task updateAppSettings {
             System.console().println("Skipped")
         }
 
-        // Update build.gradle
-        allowOverwrite = prompt(
-                "The \"build.gradle\" file will be overwritten, continue? ",
-                "[yes/NO]",
-                { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
-        ).toLowerCase()
+        if (installingPlugins.size() > 0) {
+            // Update build.gradle
+            allowOverwrite = prompt(
+                    "The \"build.gradle\" file will be overwritten, continue? ",
+                    "[yes/NO]",
+                    { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
+            ).toLowerCase()
 
-        if (allowOverwrite.equals("yes")) {
-            // TODO: update build.gradle
-        } else {
-            System.console().println("Skipped")
+            if (allowOverwrite.equals("yes")) {
+                def pluginDependencies = installingPlugins
+                        .collect { "compile '${it}'" }
+                        .join("\n    ")
+                copy {
+                    from(templateDir)
+                    into(appRootDir)
+                    include('build.gradle')
+                    filter(ReplaceTokens, tokens: [EXTRA_PLUGINS: pluginDependencies])
+                }
+            } else {
+                System.console().println("Skipped")
+            }
         }
     }
 }
