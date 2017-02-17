@@ -32,6 +32,7 @@ task updateAppSettings {
     def skygearEndpoint = ""
     def skygearApiKey = ""
     def installingPlugins = [] as LinkedList<String>
+    def allowFilesOverwrite = false
 
     def Closure<String> prompt = {
         String question = "",
@@ -61,6 +62,8 @@ task updateAppSettings {
     }
 
     doFirst {
+        def filesToChange = [] as LinkedList<String>
+
         // Read skygear endpoint
         skygearEndpoint = prompt(
                 "What is your skygear endpoint (You can find it in portal)?\n" +
@@ -103,6 +106,7 @@ task updateAppSettings {
                 "",
                 { it.trim().length() != 0 }
         )
+        filesToChange.add("MyApplication.java")
 
         // Read whether should install chat sdk
         def installChatSdkAnswer = prompt(
@@ -114,63 +118,55 @@ task updateAppSettings {
 
         if (installChatSdkAnswer.length() == 0 || installChatSdkAnswer.equals("yes")) {
             installingPlugins.add("io.skygear.plugins:chat:+")
+            filesToChange.add("build.gradle")
+        }
+
+        if (filesToChange.size() > 0) {
+            def question = String.format(
+                    "The following files will be overwritten:\n%s\ncontinue?",
+                    filesToChange.collect { "  - ${it}" }.join("\n")
+            )
+            allowFilesOverwrite = prompt(
+                    question,
+                    "[yes/no]",
+                    { it.trim().equalsIgnoreCase("yes") || it.trim().equalsIgnoreCase("no") }
+            ).trim().equalsIgnoreCase("yes")
         }
     }
 
     doLast {
+        if (!allowFilesOverwrite) {
+            System.console().println("No files will be overwritten.")
+            return
+        }
+
         System.console().println("\nScaffolding with the following settings:")
         System.console().println("Endpoint: ${skygearEndpoint}")
         System.console().println("API key: ${skygearApiKey}")
-
         System.console().printf(
-                "Installing Skygear Plugins: \n%s\n",
+                "Installing Skygear Plugins: \n%s\n\n",
                 installingPlugins.size() > 0
                         ? installingPlugins.collect { "  - ${it}" }.join("\n")
-                        : "None"
+                        : "  None"
         )
 
-        def allowOverwrite = ""
-
-        // Update MyApplication.java
-        allowOverwrite = prompt(
-                "The \"MyApplication.java\" file will be overwritten, continue? ",
-                "[yes/NO]",
-                { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
-        ).toLowerCase()
-
-        if (allowOverwrite.equals("yes")) {
-            copy {
-                from(templateDir)
-                into(appSourceDir)
-                include('MyApplication.java')
-                filter(ReplaceTokens, tokens:[ENDPOINT: skygearEndpoint, APIKEY: skygearApiKey])
-            }
-        } else {
-            System.console().println("Skipped")
+        copy {
+            from(templateDir)
+            into(appSourceDir)
+            include('MyApplication.java')
+            filter(ReplaceTokens, tokens:[ENDPOINT: skygearEndpoint, APIKEY: skygearApiKey])
         }
 
         if (installingPlugins.size() > 0) {
-            // Update build.gradle
-            allowOverwrite = prompt(
-                    "The \"build.gradle\" file will be overwritten, continue? ",
-                    "[yes/NO]",
-                    { it.length() == 0 || it.equalsIgnoreCase("yes") || it.equalsIgnoreCase("no") }
-            ).toLowerCase()
-
-            if (allowOverwrite.equals("yes")) {
-                def pluginDependencies = installingPlugins
-                        .collect { "compile '${it}'" }
-                        .join("\n    ")
-                copy {
-                    from(templateDir)
-                    into(appRootDir)
-                    include('build.gradle')
-                    filter(ReplaceTokens, tokens: [EXTRA_PLUGINS: pluginDependencies])
-                }
-            } else {
-                System.console().println("Skipped")
+            def pluginDependencies = installingPlugins
+                    .collect { "compile '${it}'" }
+                    .join("\n    ")
+            copy {
+                from(templateDir)
+                into(appRootDir)
+                include('build.gradle')
+                filter(ReplaceTokens, tokens: [EXTRA_PLUGINS: pluginDependencies])
             }
         }
     }
 }
-
