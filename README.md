@@ -20,11 +20,16 @@ You can start create an android app with [Skygear](https://skygear.io) by the fo
   For other installation method, like homebrew. Please refer back to the
   installation document.
 
-7. Run a script to update your application settings:
+7. Run a script to update your application settings. For the first time, it
+   may take some mintues to download the gradle wrapper:
 
-  `./gradlew updateAppSettings`
+  `./gradlew -q updateAppSettings`
 
-8. Open the project with Android Studio.
+8. Build your project:
+
+  `./gradlew -q build`
+
+9. Open the project with Android Studio.
 
 
 You can learn more about the Skygear Android SDK by going to https://docs.skygear.io/android/guide.
