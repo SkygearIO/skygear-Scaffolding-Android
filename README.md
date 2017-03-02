@@ -32,4 +32,4 @@ You can start create an android app with [Skygear](https://skygear.io) by the fo
 9. Open the project with Android Studio.
 
 
-You can learn more about the Skygear Android SDK by going to https://docs.skygear.io/android/guide.
+You can learn more about the Skygear Android SDK by going to https://docs.skygear.io/guides/quickstart/android/.
