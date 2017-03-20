@@ -8,7 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.2.3'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -21,7 +21,7 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
+clean << {
     delete rootProject.buildDir
 }
 
@@ -38,22 +38,28 @@ task updateAppSettings {
         String question = "",
         String promptPrefix = "",
         Closure<Boolean> validation = { true } ->
+            def console = System.console()
+            if (console == null) {
+                throw new Exception(
+                        "Null console. Please make sure it is executed in terminal, " +
+                        "not inside Android Studio")
+            }
 
             if (question.length() > 0) {
-                System.console().println("\n" + question)
+                console.println("\n" + question)
             }
 
             def promptLine = "${promptPrefix} > "
             def result = null
             while (true) {
-                result = System.console().readLine(promptLine)
+                result = console.readLine(promptLine)
 
                 try {
                     if (validation(result)) {
                         break
                     }
                 } catch (e) {
-                    System.console().println("Error: ${e.message}")
+                    console.println("Error: ${e.message}")
                 }
 
             }
@@ -135,15 +141,22 @@ task updateAppSettings {
     }
 
     doLast {
+        def console = System.console()
+        if (console == null) {
+            throw new Exception(
+                    "Null console. Please make sure it is executed in terminal, " +
+                    "not inside Android Studio")
+        }
+
         if (!allowFilesOverwrite) {
-            System.console().println("No files will be overwritten.")
+            console.println("No files will be overwritten.")
             return
         }
 
-        System.console().println("\nScaffolding with the following settings:")
-        System.console().println("Endpoint: ${skygearEndpoint}")
-        System.console().println("API key: ${skygearApiKey}")
-        System.console().printf(
+        console.println("\nScaffolding with the following settings:")
+        console.println("Endpoint: ${skygearEndpoint}")
+        console.println("API key: ${skygearApiKey}")
+        console.printf(
                 "Installing Skygear Plugins: \n%s\n\n",
                 installingPlugins.size() > 0
                         ? installingPlugins.collect { "  - ${it}" }.join("\n")
