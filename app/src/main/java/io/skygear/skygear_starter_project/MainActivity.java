@@ -73,8 +73,6 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser != null) {
             accessToken = currentUser.getAccessToken();
             userId = currentUser.getId();
-        } else {
-
         }
 
         this.accessTokenTextView.setText(String.format("Access Token: %s", accessToken));
