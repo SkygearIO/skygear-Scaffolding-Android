@@ -14,6 +14,7 @@ import org.w3c.dom.Text;
 import io.skygear.skygear.AuthResponseHandler;
 import io.skygear.skygear.Configuration;
 import io.skygear.skygear.Container;
+import io.skygear.skygear.Error;
 import io.skygear.skygear.LogoutResponseHandler;
 import io.skygear.skygear.User;
 
@@ -120,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onAuthFail(String reason) {
-                        failDialog.setMessage(String.format("Reason:\n%s", reason));
+                    public void onAuthFail(Error error) {
+                        failDialog.setMessage(String.format("Reason:\n%s", error.getMessage()));
 
                         loading.dismiss();
                         failDialog.show();
@@ -166,8 +167,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onAuthFail(String reason) {
-                        failDialog.setMessage(String.format("Reason:\n%s", reason));
+                    public void onAuthFail(Error error) {
+                        failDialog.setMessage(String.format("Reason:\n%s", error.getMessage()));
 
                         loading.dismiss();
                         failDialog.show();
@@ -204,8 +205,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLogoutFail(String reason) {
-                failDialog.setMessage(String.format("Reason:\n%s", reason));
+            public void onLogoutFail(Error error) {
+                failDialog.setMessage(String.format("Reason:\n%s", error.getMessage()));
 
                 loading.dismiss();
                 failDialog.show();
