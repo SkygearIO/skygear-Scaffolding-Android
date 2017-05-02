@@ -1,0 +1,33 @@
+language: android
+
+jdk: oraclejdk8
+
+android:
+  components:
+    - tools
+    - tools # as per https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943
+    - platform-tools
+    - build-tools-25.0.3
+    - android-25
+    - extra-android-support
+    - extra-android-m2repository
+    - extra-google-m2repository
+    - sys-img-armeabi-v7a-android-19
+  licenses:
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+script:
+    - ./gradlew -q build
+
+notifications:
+  slack:
+    rooms:
+      secure: TPVOlHEvqKOZBIz8QyxyOxV0JKNSa6Cn+1rt+6RGJldtMXl3fURhq3G6FkVNroY0PfOtdaA8pF2klYuRI0Nb/2WfEVI4zEfXIvFoebmKmo346SO7aKnrOFUW7Fw/wz2Up/uy2qq1U//8nX6w3b8uTfsZ6I0wqkGuVN1ok09BcX1MbggZd1O32PN7eFTTyqsQjzpM1YyDKGv+n9m4qTuUHs5Ntkl+kjAqnheEzIcROc8pVaNksAR8uLLV9jxjtN0YhGab0TDEFXlgx9tJJaJSWKDJ5HAEoUbo61LLQEPJlWykPHAkdORZfCUEG0PyBUErNVH3Ti2/zBlFphB/qGZ7uJQzZ/6XO7tfKz6zcVibp0BN+0RQxlBEuhMsx8Ip5oZRKa5SyeO49Mar8mi47hzen/izxCAAGLHedDg3oC3Q0T5wr53oX+RaR2A0Oapi3fu66wWTKiu+FN92HApBDz3DNwUjjOirY2QgWyfmqf/zq2tqlbeJNkSwfrgRfcHVydwCTwduYf2fMvyNtNNIE379Be+20Y2h15ZD0+kf9bN/K1TeY6byfiiSKz6HQTcNLSGgi4FczuQar/L0xcKPNUPEqcW7KB2vG6Qe9KITZntFmSomTA252sCzxMo1r6JQXv6NE+Hwwc80JC67C6j/MJzVhMdZE5fkEHqIba54ruel5Ak=
+    on_success: change
+    on_failure: change
