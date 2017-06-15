@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateViewState() {
         Configuration config = this.skygear.getConfig();
-        User currentUser = this.skygear.getCurrentUser();
+        User currentUser = this.skygear.getAuth().getCurrentUser();
 
         this.endpointTextView.setText(String.format("Endpoint: %s", config.getEndpoint()));
         this.apiKeyTextView.setText(String.format("API Key: %s", config.getApiKey()));
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         loading.show();
-        this.skygear.signupWithEmail(
+        this.skygear.getAuth().signupWithEmail(
                 this.emailEditText.getText().toString(),
                 this.passwordEditText.getText().toString(),
                 new AuthResponseHandler() {
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         loading.show();
-        this.skygear.loginWithEmail(
+        this.skygear.getAuth().loginWithEmail(
                 this.emailEditText.getText().toString(),
                 this.passwordEditText.getText().toString(),
                 new AuthResponseHandler() {
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
 
         loading.show();
-        this.skygear.logout(new LogoutResponseHandler() {
+        this.skygear.getAuth().logout(new LogoutResponseHandler() {
             @Override
             public void onLogoutSuccess() {
                 loading.dismiss();
