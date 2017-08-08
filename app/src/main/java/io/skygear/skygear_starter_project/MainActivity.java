@@ -16,7 +16,7 @@ import io.skygear.skygear.Configuration;
 import io.skygear.skygear.Container;
 import io.skygear.skygear.Error;
 import io.skygear.skygear.LogoutResponseHandler;
-import io.skygear.skygear.User;
+import io.skygear.skygear.Record;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,15 +63,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateViewState() {
         Configuration config = this.skygear.getConfig();
-        User currentUser = this.skygear.getAuth().getCurrentUser();
+        Record currentUser = this.skygear.getAuth().getCurrentUser();
+        String accessToken = this.skygear.getAuth().getCurrentAccessToken();
 
         this.endpointTextView.setText(String.format("Endpoint: %s", config.getEndpoint()));
         this.apiKeyTextView.setText(String.format("API Key: %s", config.getApiKey()));
 
-        String accessToken = "Undefined";
         String userId = "Undefined";
         if (currentUser != null) {
-            accessToken = currentUser.getAccessToken();
             userId = currentUser.getId();
         }
 
@@ -106,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 this.passwordEditText.getText().toString(),
                 new AuthResponseHandler() {
                     @Override
-                    public void onAuthSuccess(User user) {
+                    public void onAuthSuccess(Record user) {
                         successDialog.setMessage(String.format(
                                 "Sign up with user ID:\n%s",
                                 user.getId()
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 this.passwordEditText.getText().toString(),
                 new AuthResponseHandler() {
                     @Override
-                    public void onAuthSuccess(User user) {
+                    public void onAuthSuccess(Record user) {
                         successDialog.setMessage(String.format(
                                 "Log in with user ID:\n%s",
                                 user.getId()
