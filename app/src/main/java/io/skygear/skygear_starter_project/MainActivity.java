@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import io.skygear.skygear.AuthResponseHandler;
 import io.skygear.skygear.Configuration;
 import io.skygear.skygear.Container;
