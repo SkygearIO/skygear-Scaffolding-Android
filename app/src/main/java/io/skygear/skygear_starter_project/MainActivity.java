@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import io.skygear.skygear.AuthResponseHandler;
 import io.skygear.skygear.Configuration;
 import io.skygear.skygear.Container;
@@ -39,17 +37,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.endpointTextView = (TextView) findViewById(R.id.endpoint_text_view);
-        this.apiKeyTextView = (TextView) findViewById(R.id.api_key_text_view);
-        this.accessTokenTextView = (TextView) findViewById(R.id.access_token_text_view);
-        this.userIdTextView = (TextView) findViewById(R.id.user_id_text_view);
+        this.endpointTextView = findViewById(R.id.endpoint_text_view);
+        this.apiKeyTextView = findViewById(R.id.api_key_text_view);
+        this.accessTokenTextView = findViewById(R.id.access_token_text_view);
+        this.userIdTextView = findViewById(R.id.user_id_text_view);
 
-        this.emailEditText = (EditText) findViewById(R.id.email_edit_text);
-        this.passwordEditText = (EditText) findViewById(R.id.password_edit_text);
+        this.emailEditText = findViewById(R.id.email_edit_text);
+        this.passwordEditText = findViewById(R.id.password_edit_text);
 
-        this.signupButton = (Button) findViewById(R.id.signup_button);
-        this.loginButton = (Button) findViewById(R.id.login_button);
-        this.logoutButton = (Button) findViewById(R.id.logout_button);
+        this.signupButton = findViewById(R.id.signup_button);
+        this.loginButton = findViewById(R.id.login_button);
+        this.logoutButton = findViewById(R.id.logout_button);
 
         this.skygear = Container.defaultContainer(this);
     }
